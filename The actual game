@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Powerlifting Tycoon</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #071025 0%, #0c1320 100%);
+      color: #e6eef6;
+      margin: 0;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 20px;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    /* Left Panel */
+    #leftPanel {
+      background: #0b1220;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 0 20px #f97316;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #leftPanel > div:first-child {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    #leftPanel h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    #leftPanel .subtitle {
+      font-size: 13px;
+      color: #99a3b2;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      margin: 12px 0;
+    }
+
+    #stats {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #stats > div.flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    #stats .stat-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #stats .stat-block > div:first-child {
+      color: #99a3b2;
+    }
+
+    #stats .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      text-shadow: 0 0 8px #f97316;
+    }
+
+    #stats .stat-desc {
+      font-size: 13px;
+      color: #99a3b2;
+    }
+
+    #trainSection {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    #trainBtn {
+      background: #f97316;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 10px #f97316;
+      transition: 0.2s all;
+      flex-shrink: 0;
+    }
+
+    #trainBtn:hover:not(:disabled) {
+      background: #e06b12;
+      box-shadow: 0 0 15px #e06b12;
+    }
+
+    #gpsDisplay {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #f97316;
+      font-weight: 600;
+      font-size: 18px;
+      min-width: 120px;
+      user-select: none;
+    }
+
+    #progressContainer {
+      margin-top: 12px;
+    }
+
+    #progressContainer > div:first-child {
+      color: #99a3b2;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    #progBarContainer {
+      height: 12px;
+      background: #071226;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    #progBar {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #fbbf24, #fb923c);
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    #saveLoadReset {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #saveLoadReset button {
+      background: #1e293b;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      box-shadow: 0 0 6px #f97316;
+      flex-shrink: 0;
+    }
+
+    #saveLoadReset button:hover {
+      background: #29394e;
+    }
+
+    footer {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #99a3b2;
+      user-select: none;
+    }
+
+    /* Right Panel */
+    #rightPanel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card {
+      background: #0b1220;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 0 20px #f97316;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Shop Card */
+    #shopHeader {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: #99a3b2;
+      font-weight: 600;
+      user-select: none;
+    }
+
+    #shopList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #f97316 #1e293b;
+    }
+    #shopList::-webkit-scrollbar {
+      width: 8px;
+    }
+    #shopList::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 8px;
+    }
+    #shopList::-webkit-scrollbar-thumb {
+      background-color: #f97316;
+      border-radius: 8px;
+    }
+
+    #shopList button {
+      background: #1e293b;
+      color: #f97316;
+      border: none;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 6px #f97316;
+      font-weight: 600;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background 0.2s ease;
+    }
+
+    #shopList button:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+      box-shadow: none;
+      background: #15202b;
+      color: #666;
+    }
+
+    #shopList button:hover:not(:disabled) {
+      background: #f97316;
+      color: #0b1220;
+      box-shadow: 0 0 10px #f97316;
+    }
+
+    /* Upgrades */
+    #upgrades {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+      max-height: 220px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #f97316 #1e293b;
+    }
+    #upgrades::-webkit-scrollbar {
+      width: 8px;
+    }
+    #upgrades::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 8px;
+    }
+    #upgrades::-webkit-scrollbar-thumb {
+      background-color: #f97316;
+      border-radius: 8px;
+    }
+
+    #upgrades button {
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 0 6px #f97316;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+      transition: background 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #upgrades button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      box-shadow: none;
+    }
+
+    #upgrades button.bought {
+      background: #4ade80;
+      color: #064e03;
+      cursor: default;
+      box-shadow: 0 0 10px #22c55e;
+    }
+
+    #upgrades button:not(.bought):hover:not(:disabled) {
+      background: #f97316;
+      color: #0b1220;
+      box-shadow: 0 0 10px #f97316;
+    }
+
+    /* Stats Card */
+    #statsCard .title {
+      color: #99a3b2;
+      font-size: 13px;
+      user-select: none;
+    }
+
+    #statsCard .stats-container {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 8px;
+      min-width: 160px;
+      text-align: center;
+      border-radius: 8px;
+      user-select: none;
+    }
+
+    .stat-box .value {
+      font-size: 32px;
+      font-weight: 700;
+      text-shadow: 0 0 8px #f97316;
+    }
+
+    #competeBtn {
+      margin-top: 12px;
+      background: #f97316;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 10px #f97316;
+      transition: 0.2s all;
+      user-select: none;
+    }
+
+    #competeBtn:hover {
+      background: #e06b12;
+      box-shadow: 0 0 15px #e06b12;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+        padding: 12px;
+      }
+      #leftPanel, #rightPanel {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left Panel -->
+  <div id="leftPanel">
+    <div>
+      <div style="font-size:36px;">🏋️‍♂️</div>
+      <div>
+        <h1>Powerlifting Tycoon</h1>
+        <div class="subtitle">Train, buy gear, hire a coach, and become legendary</div>
+      </div>
+    </div>
+
+    <hr />
+
+    <div id="stats">
+      <div class="flex-between">
+        <div class="stat-block">
+          <div>Strength</div>
+          <div id="strength" class="stat-value">0</div>
+          <div class="stat-desc">Strength points represent your lifting progress</div>
+        </div>
+        <div class="stat-block" style="text-align:right;">
+          <div>Rep Points</div>
+          <div id="rep" class="stat-value">0</div>
+          <div class="stat-desc">Prestige currency (from Competing)</div>
+        </div>
+      </div>
+
+      <div id="trainSection">
+        <button id="trainBtn">Train +1</button>
+        <div id="gpsDisplay">0 / sec</div>
+      </div>
+
+      <div id="progressContainer">
+        <div>Training Progress</div>
+        <div id="progBarContainer"><i id="progBar"></i></div>
+      </div>
+
+      <div id="saveLoadReset">
+        <button id="saveBtn">Save</button>
+        <button id="loadBtn">Load</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+    </div>
+
+    <footer>
+      Tip: Train manually or buy gear to increase your GPS (Gain Per Second)!<br/>
+      Press "Compete" when ready to prestige and earn Rep Points!
+    </footer>
+  </div>
+
+  <!-- Right Panel -->
+  <div id="rightPanel">
+    <div class="card" id="shopCard">
+      <div id="shopHeader">Shop: Equipment & Gear</div>
+      <div id="shopList" title="Buy items to increase your GPS"></div>
+    </div>
+
+    <div class="card" id="upgradesCard">
+      <div id="upgradesHeader" style="color:#99a3b2; font-weight:600; user-select:none;">
+        Upgrades & Training Enhancements
+      </div>
+      <div id="upgrades" title="Buy upgrades to boost your training"></div>
+    </div>
+
+    <div class="card" id="statsCard">
+      <div class="title">Session & Career Stats</div>
+      <div class="stats-container">
+        <div class="stat-box">
+          <div>Total Training Sessions</div>
+          <div id="totalTrains" class="value">0</div>
+        </div>
+        <div class="stat-box">
+          <div>Best Session Gain</div>
+          <div id="bestSession" class="value">0</div>
+        </div>
+        <div class="stat-box">
+          <div>Level</div>
+          <div id="level" class="value">1</div>
+        </div>
+      </div>
+
+      <button id="competeBtn" title="Reset progress for Rep Points & boost gains">Compete (Prestige)</button>
+    </div>
+  </div>
+
+  <script>
+    // Initial state
+    const state = {
+      strength: 0,
+      money: 0,
+      rep: 0,
+      gps: 0,
+      level: 1,
+      totalTrains: 0,
+      bestSession: 0,
+      sessionGain: 0,
+      prestigeMultiplier: 1,
+      prestigeRequirement: 100,
+      lastTick: Date.now(),
+    };
+
+    // Base items (gear)
+    const baseItems = [
+      {id:'barbell', name:'Barbell', cost:50, gps:1, qty:0, desc:'Basic barbell to start training'},
+      {id:'weightPlates', name:'Weight Plates', cost:250, gps:5, qty:0, desc:'Add weight plates to increase gain per second'},
+      {id:'liftingBelt', name:'Lifting Belt', cost:1000, gps:15, qty:0, desc:'Supports your lifts, increasing GPS'},
+      {id:'wristWraps', name:'Wrist Wraps', cost:3000, gps:40, qty:0, desc:'Stabilize wrists, improving gains'},
+      {id:'liftingShoes', name:'Lifting Shoes', cost:12000, gps:100, qty:0, desc:'Improve form and stability'},
+      {id:'chalk', name:'Chalk', cost:50000, gps:250, qty:0, desc:'Better grip increases efficiency'},
+      {id:'powerRack', name:'Power Rack', cost:120000, gps:550, qty:0, desc:'Train safely and heavier'},
+      {id:'benchPress', name:'Bench Press', cost:450000, gps:1200, qty:0, desc:'Boost chest and triceps gains'},
+      {id:'deadliftPlatform', name:'Deadlift Platform', cost:1000000, gps:2500, qty:0, desc:'Perfect setup for deadlifts'},
+    ];
+
+    // Upgrades and boosts
+    const baseUpgrades = [
+      {id:'technique', name:'Improve Technique', emoji:'💪', cost:500, effect:()=>state.gps *= 1.5, desc:'Increase all GPS by 50% (one-time)', bought:false},
+      {id:'gearmod', name:'Optimize Gear', emoji:'⚙️', cost:2500, effect:()=>state.gps += 5, desc:'Add flat +5 GPS', bought:false},
+      {id:'supps', name:'Advanced Supplements', emoji:'💊', cost:10000, effect:()=>state.gps *= 2, desc:'Double all GPS', bought:false},
+      {id:'nutrition', name:'Nutrition Plan', emoji:'🥗', cost:15000, effect:()=>state.prestigeMultiplier += 0.2, desc:'Increase prestige multiplier by 0.2', bought:false},
+      {id:'mental', name:'Mental Conditioning', emoji:'🧠', cost:20000, effect:()=>state.strength += 100, desc:'Instant +100 Strength', bought:false},
+      {id:'equipmentUpgrade', name:'Elite Equipment', emoji:'🏋️‍♀️', cost:50000, effect:()=>state.gps *= 3, desc:'Triple all GPS', bought:false},
+      {id:'advancedCoach', name:'Hire Elite Coach', emoji:'🎓', cost:75000, effect:()=>state.gps += 50, desc:'Add +50 GPS', bought:false},
+      {id:'sponsorshipBoost', name:'Big Sponsorship', emoji:'💼', cost:150000, effect:()=>state.prestigeMultiplier += 0.5, desc:'Increase prestige multiplier by 0.5', bought:false},
+      {id:'trainingProgram', name:'Scientific Training Program', emoji:'📊', cost:250000, effect:()=>state.gps *= 4, desc:'Quadruple GPS', bought:false},
+      {id:'legendaryGear', name:'Legendary Gear Set', emoji:'🔥', cost:500000, effect:()=>state.gps += 200, desc:'Add +200 GPS', bought:false},
+    ];
+
+    // Update UI function
+    function updateUI() {
+      document.getElementById('strength').textContent = Math.floor(state.strength);
+      document.getElementById('money').textContent = Math.floor(state.money);
+      document.getElementById('rep').textContent = Math.floor(state.rep);
+      document.getElementById('gpsDisplay').textContent = state.gps.toFixed(2) + ' / sec';
+      document.getElementById('level').textContent = state.level;
+      document.getElementById('totalTrains').textContent = state.totalTrains;
+      document.getElementById('bestSession').textContent = Math.floor(state.bestSession);
+
+      // Update progress bar (simulate training progress out of 100)
+      let progPercent = (state.sessionGain / 100) * 100;
+      if (progPercent > 100) progPercent = 100;
+      document.getElementById('progBar').style.width = progPercent + '%';
+
+      // Populate shop items
+      const shopList = document.getElementById('shopList');
+      shopList.innerHTML = '';
+      baseItems.forEach(item => {
+        const btn = document.createElement('button');
+        btn.textContent = `${item.name} (${item.qty}) - $${item.cost}`;
+        btn.title = item.desc;
+        btn.disabled = state.money < item.cost;
+        btn.onclick = () => buyItem(item.id);
+        shopList.appendChild(btn);
+      });
+
+      // Populate upgrades
+      const upgradesDiv = document.getElementById('upgrades');
+      upgradesDiv.innerHTML = '';
+      baseUpgrades.forEach(upg => {
+        const upgBtn = document.createElement('button');
+        upgBtn.innerHTML = `${upg.emoji} ${upg.name} - $${upg.cost}`;
+        upgBtn.title = upg.desc;
+        if (upg.bought) {
+          upgBtn.classList.add('bought');
+          upgBtn.disabled = true;
+        } else {
+          upgBtn.disabled = state.money < upg.cost;
+          upgBtn.onclick = () => buyUpgrade(upg.id);
+        }
+        upgradesDiv.appendChild(upgBtn);
+      });
+    }
+
+    // Buy item function
+    function buyItem(itemId) {
+      const item = baseItems.find(i => i.id === itemId);
+      if (!item || state.money < item.cost) return;
+      state.money -= item.cost;
+      item.qty++;
+      state.gps += item.gps;
+      item.cost = Math.floor(item.cost * 1.15); // Price inflation
+      updateUI();
+    }
+
+    // Buy upgrade function
+    function buyUpgrade(upgId) {
+      const upg = baseUpgrades.find(u => u.id === upgId);
+      if (!upg || upg.bought || state.money < upg.cost) return;
+      state.money -= upg.cost;
+      upg.bought = true;
+      upg.effect();
+      updateUI();
+    }
+
+    // Train function (manual click)
+    function train() {
+      const gain = 1 * state.prestigeMultiplier;
+      state.strength += gain;
+      state.sessionGain += gain;
+      state.totalTrains++;
+      state.money += gain * 0.5; // small money gain on training
+      if (state.sessionGain > state.bestSession) {
+        state.bestSession = state.sessionGain;
+      }
+
+      // Level up every 100 strength
+      if (state.strength >= state.level * 100) {
+        state.level++;
+        // Every level up increases gps by 10%
+        state.gps *= 1.1;
+      }
+
+      updateUI();
+    }
+
+    // Auto increment GPS per second
+    function tick() {
+      const now = Date.now();
+      const delta = (now - state.lastTick) / 1000;
+      state.lastTick = now;
+
+      const gain = state.gps * delta * state.prestigeMultiplier;
+      state.strength += gain;
+      state.sessionGain += gain;
+      state.money += gain * 0.3;
+
+      // Update level if strength crossed thresholds
+      while (state.strength >= state.level * 100) {
+        state.level++;
+        state.gps *= 1.1;
+      }
+
+      if (state.sessionGain > state.bestSession) {
+        state.bestSession = state.sessionGain;
+      }
+
+      updateUI();
+    }
+
+    // Compete (Prestige) function
+    function compete() {
+      if (state.strength < state.prestigeRequirement) {
+        alert(`You need at least ${state.prestigeRequirement} strength to compete.`);
+        return;
+      }
+
+      // Calculate prestige points (rep)
+      const repGained = Math.floor(state.strength / state.prestigeRequirement);
+      state.rep += repGained;
+      state.prestigeMultiplier = 1 + state.rep * 0.1;
+
+      // Reset session stats but keep rep
+      state.strength = 0;
+      state.money = 0;
+      state.gps = 0;
+      state.level = 1;
+      state.totalTrains = 0;
+      state.sessionGain = 0;
+      baseItems.forEach(item => {
+        item.qty = 0;
+        item.cost = getBaseCost(item.id);
+      });
+      baseUpgrades.forEach(upg => {
+        upg.bought = false;
+      });
+
+      alert(`You competed and earned ${repGained} Rep Points! Your prestige multiplier is now x${state.prestigeMultiplier.toFixed(2)}`);
+
+      updateUI();
+    }
+
+    // Helper to get base cost of item (reset costs on prestige)
+    function getBaseCost(id) {
+      const baseCosts = {
+        barbell: 50,
+        weightPlates: 250,
+        liftingBelt: 1000,
+        wristWraps: 3000,
+        liftingShoes: 12000,
+        chalk: 50000,
+        powerRack: 120000,
+        benchPress: 450000,
+        deadliftPlatform: 1000000,
+      };
+      return baseCosts[id] || 0;
+    }
+
+    // Save game to localStorage
+    function saveGame() {
+      const saveData = {
+        state: {
+          strength: state.strength,
+          money: state.money,
+          rep: state.rep,
+          gps: state.gps,
+          level: state.level,
+          totalTrains: state.totalTrains,
+          bestSession: state.bestSession,
+          sessionGain: state.sessionGain,
+          prestigeMultiplier: state.prestigeMultiplier,
+          lastTick: state.lastTick,
+          prestigeRequirement: state.prestigeRequirement,
+        },
+        items: baseItems.map(i => ({id: i.id, qty: i.qty, cost: i.cost})),
+        upgrades: baseUpgrades.map(u => ({id: u.id, bought: u.bought})),
+      };
+      localStorage.setItem('powerliftingTycoonSave', JSON.stringify(saveData));
+      alert('Game saved!');
+    }
+
+    // Load game from localStorage
+    function loadGame() {
+      const saveStr = localStorage.getItem('powerliftingTycoonSave');
+      if (!saveStr) {
+        alert('No save found.');
+        return;
+      }
+      try {
+        const saveData = JSON.parse(saveStr);
+        Object.assign(state, saveData.state);
+        saveData.items.forEach(savedItem => {
+          const item = baseItems.find(i => i.id === savedItem.id);
+          if (item) {
+            item.qty = savedItem.qty;
+            item.cost = savedItem.cost;
+          }
+        });
+        saveData.upgrades.forEach(savedUpg => {
+          const upg = baseUpgrades.find(u => u.id === savedUpg.id);
+          if (upg) {
+            upg.bought = savedUpg.bought;
+            if (upg.bought) {
+              upg.effect();
+            }
+          }
+        });
+        updateUI();
+        alert('Game loaded!');
+      } catch (e) {
+        alert('Failed to load save: ' + e.message);
+      }
+    }
+
+    // Reset game
+    function resetGame() {
+      if (!confirm('Are you sure you want to reset your progress? This cannot be undone.')) return;
+      localStorage.removeItem('powerliftingTycoonSave');
+      location.reload();
+    }
+
+    // Event listeners
+    document.getElementById('trainBtn').addEventListener('click', train);
+    document.getElementById('saveBtn').addEventListener('click', saveGame);
+    document.getElementById('loadBtn').addEventListener('click', loadGame);
+    document.getElementById('resetBtn').addEventListener('click', resetGame);
+    document.getElementById('competeBtn').addEventListener('click', compete);
+
+    // Initialize UI
+    updateUI();
+
+    // Game loop (tick every 100ms)
+    setInterval(tick, 100);
+  </script>
+</body>
+</html>
